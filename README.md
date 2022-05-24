@@ -8,58 +8,50 @@
 
 Uber разработал собственную такую систему H3, обладающую рядом преимуществ над существующими до этого. Он использует ее для задач динамического ценообразования, диспетчеризации, визуализации и др. исследований.
 
-![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/874c2b37-888f-4764-bfb8-1d15b94d7224/Untitled.png)
+![image](https://user-images.githubusercontent.com/492870/169981099-1ad65793-fbc3-4440-b3be-894ae9c349a9.png)
 
-![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/df6ca5bf-de0a-44c9-a335-92e9d2f1fa24/Untitled.png)
+![image](https://user-images.githubusercontent.com/492870/169981125-a367787e-ac15-4fd1-b2a6-ae684f3e867b.png)
 
-![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/5505c725-175a-4246-894a-c3553b185f81/Untitled.png)
+![image](https://user-images.githubusercontent.com/492870/169981145-9d546cc5-69c8-4af8-9cb1-c40b08ffd808.png)
 
 **Технические подробности**
 
 Изначально поверхность земли представлена в виде сферического икосаэдра – многогранника с 20 гранями. Каждая грань – треугольник. На каждый треугольник проецируются многоугольники, центрируясь по центру грани. В результате получается разбиение 0-го масштаба. Образуется 122 многоугольника. Из них 110 шестиугольников и 12 пятиугольников. Из-за превалирования шестиугольников схема получила название гексагональной
 
-![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/19db8702-0070-48d0-99e4-aa27ffd89ee1/Untitled.png)
-
-![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/99ee9601-57c4-4695-b638-9d5dd5739b9d/Untitled.png)
-
-![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/8b75ac13-0f1d-423a-ad56-a37780f37ae5/Untitled.png)
-
+![image](https://user-images.githubusercontent.com/492870/169981192-f5c3d45b-5a4d-4d8c-ba10-d7d7186144cb.png)
+![image](https://user-images.githubusercontent.com/492870/169981205-bc129c0d-c288-4b0c-b70b-cf56d8f4f1da.png)
+![image](https://user-images.githubusercontent.com/492870/169981222-ae5769b6-11db-4e69-a9c0-cf6d798300f6.png)
 **Иерархическое представление**
 
 Каждый гексагон 0-го масштаба разбивается на7 дочерних гексагонов. Пятиугольник на 5 дочерних 5 угольников. Каждый дочерний многоугольник разбивается на более мелкие. H3 всего состоит из 16 масштабов.
 
-![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/cec776d7-3836-47b4-866f-e393aed29917/Untitled.png)
-
-![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/711f03a2-18a6-499f-a1c7-cd09a26967c6/Untitled.png)
-
+![image](https://user-images.githubusercontent.com/492870/169981259-ef58dbcc-b97a-4c12-b17d-0b777ec43eb5.png)
+![image](https://user-images.githubusercontent.com/492870/169981282-62e74dc4-1f81-4481-9665-e5e9ad9a29c3.png)
 Каждый дочерний многоугольник может однозначно идентифицироваться относительно родительского по следующей схеме. Идентификатор по сути представляет целое число от 0 до 6.
 
-![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/bcf3cc63-a51a-49cf-b1a4-7e07fd9c3bd8/Untitled.png)
-
+![image](https://user-images.githubusercontent.com/492870/169981315-72db4912-1755-4730-b475-9abeeaa5ff7f.png)
 Перечисляя номера ячеек относительно родительской, двигаясь от большего масштаба к меньшему, и получается иерархический индекс. Пример:
 
-![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/e73c4e42-5222-486b-a88a-1f8b24abf15b/Untitled.png)
-
-Значение 7 (111) – означает, что индекс в этом масштабе не представлен
+![image](https://user-images.githubusercontent.com/492870/169981594-7598df04-575a-4309-86be-0391264f39eb.png)
 
 **Бинарное представление индекса**
 
 Индекс представляет собой число *ulong*.
 
-![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/7c2f2469-d4fb-4164-9793-64cc71e7e4fd/Untitled.png)
+![image](https://user-images.githubusercontent.com/492870/169981697-a38ef1dc-8c9c-450c-826e-1e8bc03c570f.png)
 
 Идея – если индексировать в более детальном масштабе, можно вести поиск по более грубому масштабу – т.е. по родительским гексагонам
 Для этого убираем ведущие биты со служебной информацией. И делаем обычный числовой индекс в БД.
 
-![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/d00b86d6-154f-4320-b073-b39c66068cfc/Untitled.png)
-
+![image](https://user-images.githubusercontent.com/492870/169981784-f14aeda2-36d6-48dd-958d-a61b09c9cf40.png)
 В результаты в выборку попадут все шестиугольника у которых бинарный префикс будет равен зеленой части. Они будут являться потомками поискового шестиугольника.
 
 Подобный алгоритм работает при индексации S2 в монге
 
 **Объединение соседних ячеек**
 
-![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/0c26d977-4d42-4534-b985-c69e0073b8fe/Untitled.png)
+![image](https://user-images.githubusercontent.com/492870/169981829-fd8ace83-cf17-47b0-9c72-d72f8454897c.png)
+![image](https://user-images.githubusercontent.com/492870/169981874-35750ae6-e7de-4726-951b-0ea85a2f57de.png)
 
 Соседние ячейки будут иметь соседние интервалы. При построении поискового запроса эти интервалы можно объединять. Количество обходов индекса в БД при этом будет уменьшаться
 
